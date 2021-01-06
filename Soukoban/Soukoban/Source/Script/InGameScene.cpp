@@ -5,6 +5,7 @@
 #include "../Manager/InputManager.h"
 #include "../Manager/GameManager.h"
 #include "../ImagesDefinition.h"
+#include "../Manager/TextureManager.h"
 
 enum{
 	Step_StartJingle,
@@ -27,18 +28,15 @@ const int SampleStage[STAGE_HEIGHT][STAGE_WIDTH] = {
 	0,0,0,1,0,1,0,1,0,1,0,0,0,
 	0,0,0,1,0,0,0,0,0,1,0,0,0,
 	0,0,0,1,0,0,2,0,0,1,0,0,0,
-	0,0,0,1,1,1,0,1,1,1,0,0,0,
+	0,0,0,1,1,1,1,1,1,1,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,
 };
-
-int InGameScene::GraphHandle::clear = 0;
 
 InGameScene::InGameScene():playerX( 0 ), playerY( 0 ){
 
 	Reset();
 
 	step = Step_StartJingle;
-	LoadMem();
 }
 
 InGameScene::~InGameScene(){
@@ -78,25 +76,27 @@ void InGameScene::Draw(){
 	//	ObjectType_UnsetCrate,		// 4 紫(255,   0, 255)
 	//	ObjectType_SetCrate = 7,	// 7 緑(  0, 255,   0)
 
+	static TextureManager* instance = TextureManager::GetInstance();
+
 	for( int y = 0; y < STAGE_HEIGHT; y++ ){
 		for( int x = 0; x < STAGE_WIDTH; x++ ){
-			int colorTemp = 0;
-			switch( stageData[y][x] ){
-			case ObjectType::Obj_Wall:		 colorTemp = GetColor( 255, 255, 255 ); break;
-			case ObjectType::Obj_Target:	 colorTemp = GetColor( 255, 0, 0 ); break;
-			case ObjectType::Obj_UnsetCrate: colorTemp = GetColor( 255, 0, 255 ); break;
-			case ObjectType::Obj_SetCrate:	 colorTemp = GetColor( 0, 255, 0 ); break;
-			default: break;
-			}
-			DrawBox( x * CHIP_WIDTH, y * CHIP_HEIGHT, x * CHIP_WIDTH + CHIP_WIDTH, y * CHIP_HEIGHT + CHIP_HEIGHT, colorTemp, true );
+			int handleTemp = instance->GetObjectHandle( stageData[y][x] );
+			if( stageData[y][x] == ObjectType::Obj_Player ) handleTemp = instance->GetObjectHandle( ObjectType::Obj_Ground );
+
+			DrawGraph( x * CHIP_WIDTH, y * CHIP_HEIGHT, handleTemp, false );
 		}
 	}
 
 	// プレイヤーの描画
-	DrawBox( playerX * CHIP_WIDTH, playerY * CHIP_HEIGHT, playerX * CHIP_WIDTH + CHIP_WIDTH, playerY * CHIP_HEIGHT + CHIP_HEIGHT, GetColor( 255, 255, 0 ), true );
+	DrawGraph( playerX * CHIP_WIDTH, playerY * CHIP_HEIGHT, instance->GetObjectHandle( ObjectType::Obj_Player ), true );
 
+	// クリア表示 & Enterキーを押すように誘導(1秒間隔で点滅)
+	static int flashingCounter = 0;
 	if( IsClear() ){
-		DrawGraph( Images::UI::clear.drawCenterX, Images::UI::clear.drawCenterY, GraphHandle::clear, true );
+		flashingCounter++;
+
+		if( flashingCounter < FRAME_RATE )	DrawGraph( Images::UI::clearGuide.drawCenterX, Images::UI::clearGuide.drawCenterY, instance->GetGuideHandle(), true );
+		else if( flashingCounter >= FRAME_RATE * 2 )	flashingCounter = 0;
 	}
 }
 
@@ -266,8 +266,4 @@ void InGameScene::DrawUI(){
 	DrawString( 430, 210, " ← : 左移動", GetColor( 0, 0, 0 ) );
 	DrawString( 430, 230, "  R : リセット", GetColor( 0, 0, 0 ) );
 	DrawString( 430, 250, "esc : 終了", GetColor( 0, 0, 0 ) );
-}
-
-void InGameScene::LoadMem(){
-	GraphHandle::clear = LoadGraph( Images::UI::clear.path );
 }

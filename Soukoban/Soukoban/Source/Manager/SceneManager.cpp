@@ -5,6 +5,7 @@
 #include "../Script/TitleScene.h"
 #include "../Script/InGameScene.h"
 #include "../Script/ResultScene.h"
+#include "TextureManager.h"
 #include "DxLib.h"
 
 SceneID SceneManager::nextSceneID = SceneID::ID_Invalid;
@@ -25,8 +26,6 @@ void SceneManager::Exec(){
 	pScene->Exec();
 	if( pScene->IsEnd() ){
 		delete pScene;
-		InitGraph();
-		InitSoundMem();
 		pScene = CreateNextScene();
 	}
 }
@@ -45,9 +44,18 @@ SceneBase* SceneManager::CreateNextScene(){
 	SceneBase* next = nullptr;
 	switch( nextSceneID )
 	{
-	case SceneID::ID_Title:	next = new TitleScene();	break;
-	case SceneID::ID_InGame:	next = new InGameScene();	break;
-	case SceneID::ID_Result:	next = new ResultScene();	break;
+	case SceneID::ID_Title:
+		next = new TitleScene();
+		TextureManager::GetInstance()->LoadGraphHandle( SceneID::ID_Title );
+		break;
+	case SceneID::ID_InGame:
+		next = new InGameScene();
+		TextureManager::GetInstance()->LoadGraphHandle( SceneID::ID_InGame );
+		break;
+	case SceneID::ID_Result:
+		next = new ResultScene();
+		TextureManager::GetInstance()->LoadGraphHandle( SceneID::ID_Result );
+		break;
 	default:		break;
 	}
 

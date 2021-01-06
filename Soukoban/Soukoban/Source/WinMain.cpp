@@ -3,6 +3,7 @@
 #include "Manager/SceneManager.h"
 #include "Manager/InputManager.h"
 #include "Manager/GameManager.h"
+#include "Manager/TextureManager.h"
 
 int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow ){
 
@@ -19,6 +20,7 @@ int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	// 管理クラスの作成
 	GameManager::CreateInstance();
 	InputManager::CreateInstance();
+	TextureManager::CreateInstance();
 	SceneManager::CreateInstance();
 
 	// メインループ
@@ -43,8 +45,12 @@ int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	}
 
 	SceneManager::DestroyInstance();
+	TextureManager::DestroyInstance();
 	InputManager::DestroyInstance();
 	GameManager::DestroyInstance();
+
+	InitGraph();
+	InitSoundMem();
 
 	DxLib_End();
 	return 0;

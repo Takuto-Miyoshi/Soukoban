@@ -39,18 +39,11 @@ private:
 	// UIの表示
 	void DrawUI();
 
-	// ファイルの読み込み
-	void LoadMem();
-
 private:
 	int stageData[STAGE_HEIGHT][STAGE_WIDTH];
 	int playerX;
 	int playerY;
 	int frameCounter;
-
-	struct GraphHandle{
-		static int clear;
-	};
 };
 
 #endif IN_GAME_SCENE_H

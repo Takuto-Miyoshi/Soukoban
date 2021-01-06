@@ -4,6 +4,7 @@
 #include "../Manager/SceneManager.h"
 #include "../Manager/InputManager.h"
 #include "../ImagesDefinition.h"
+#include "../Manager/TextureManager.h"
 
 enum{
 	Step_LogoIn,
@@ -11,13 +12,9 @@ enum{
 	Step_End
 };
 
-int TitleScene::GraphHandle::backGround = 0;
-int TitleScene::GraphHandle::guide = 0;
-
 TitleScene::TitleScene(){
 	step = Step_LogoIn;
 
-	LoadMem();
 	SetFontSize( 16 );
 }
 
@@ -35,14 +32,16 @@ void TitleScene::Exec(){
 }
 
 void TitleScene::Draw(){
+	static TextureManager* instance = TextureManager::GetInstance();
+
 	// 背景描画
-	DrawGraph( 0, 0, GraphHandle::backGround, false );
+	DrawGraph( 0, 0, instance->GetBackGroundHandle(), false );
 
 	// Enterキーを押すように誘導(0.5秒間隔で点滅)
 	static int flashingCounter = 0;
 	flashingCounter++;
 
-	if( flashingCounter < FRAME_RATE / 2 )		DrawGraph( Images::UI::titleGuide.drawCenterX, 350, GraphHandle::guide, true );
+	if( flashingCounter < FRAME_RATE / 2 )		DrawGraph( Images::UI::titleGuide.drawCenterX, 350, instance->GetGuideHandle(), true );
 	else if( flashingCounter >= FRAME_RATE )	flashingCounter = 0;
 }
 
@@ -59,9 +58,4 @@ void TitleScene::Input(){
 		step = Step_End;
 		SceneManager::GetInstance()->SetNextScene( SceneID::ID_InGame );
 	}
-}
-
-void TitleScene::LoadMem(){
-	GraphHandle::backGround = LoadGraph( Images::BackGround::title.path );
-	GraphHandle::guide = LoadGraph( Images::UI::titleGuide.path );
 }

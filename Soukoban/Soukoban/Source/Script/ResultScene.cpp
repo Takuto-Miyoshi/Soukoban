@@ -5,19 +5,16 @@
 #include "../Manager/InputManager.h"
 #include "../Manager/GameManager.h"
 #include "../ImagesDefinition.h"
+#include "../Manager/TextureManager.h"
 
 enum{
 	Step_Input,
 	Step_End
 };
 
-int ResultScene::GraphHandle::backGround = 0;
-int ResultScene::GraphHandle::guide = 0;
-
 ResultScene::ResultScene(){
 	step = Step_Input;
 
-	LoadMem();
 	SetFontSize( 48 );
 }
 
@@ -34,8 +31,10 @@ void ResultScene::Exec(){
 }
 
 void ResultScene::Draw(){
+	static TextureManager* instance = TextureManager::GetInstance();
+
 	// 背景描画
-	DrawGraph( 0, 0, GraphHandle::backGround, false );
+	DrawGraph( 0, 0, instance->GetBackGroundHandle(), false );
 
 	// 結果表示
 	DrawFormatString( 100, WINDOW_HEIGHT / 2, GetColor( 0, 0, 0 ), "経過時間 : %02d分 %02d秒", GameManager::GetInstance()->GetMin(), GameManager::GetInstance()->GetSec() );
@@ -45,7 +44,7 @@ void ResultScene::Draw(){
 	static int flashingCounter = 0;
 	flashingCounter++;
 
-	if( flashingCounter < FRAME_RATE / 2 )		DrawGraph( Images::UI::resultGuide.drawCenterX, 350, GraphHandle::guide, true );
+	if( flashingCounter < FRAME_RATE / 2 )		DrawGraph( Images::UI::resultGuide.drawCenterX, 350, instance->GetGuideHandle(), true );
 	else if( flashingCounter >= FRAME_RATE )	flashingCounter = 0;
 }
 
@@ -58,9 +57,4 @@ void ResultScene::Input(){
 		step = Step_End;
 		SceneManager::GetInstance()->SetNextScene( SceneID::ID_Title );
 	}
-}
-
-void ResultScene::LoadMem(){
-	GraphHandle::backGround = LoadGraph( Images::BackGround::result.path );
-	GraphHandle::guide = LoadGraph( Images::UI::resultGuide.path );
 }
