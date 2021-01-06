@@ -3,6 +3,7 @@
 #include "DxLib.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/InputManager.h"
+#include "../ImagesDefinition.h"
 
 enum{
 	Step_LogoIn,
@@ -10,8 +11,14 @@ enum{
 	Step_End
 };
 
+int TitleScene::GraphHandle::backGround = 0;
+int TitleScene::GraphHandle::guide = 0;
+
 TitleScene::TitleScene(){
 	step = Step_LogoIn;
+
+	LoadMem();
+	SetFontSize( 16 );
 }
 
 TitleScene::~TitleScene(){
@@ -28,7 +35,15 @@ void TitleScene::Exec(){
 }
 
 void TitleScene::Draw(){
-	DrawString( 20, 20, "TitleScene", GetColor( 0, 0, 0 ) );
+	// 背景描画
+	DrawGraph( 0, 0, GraphHandle::backGround, false );
+
+	// Enterキーを押すように誘導(0.5秒間隔で点滅)
+	static int flashingCounter = 0;
+	flashingCounter++;
+
+	if( flashingCounter < FRAME_RATE / 2 )		DrawGraph( Images::UI::titleGuide.drawCenterX, 350, GraphHandle::guide, true );
+	else if( flashingCounter >= FRAME_RATE )	flashingCounter = 0;
 }
 
 bool TitleScene::IsEnd() const{
@@ -46,3 +61,7 @@ void TitleScene::Input(){
 	}
 }
 
+void TitleScene::LoadMem(){
+	GraphHandle::backGround = LoadGraph( Images::BackGround::title.path );
+	GraphHandle::guide = LoadGraph( Images::UI::titleGuide.path );
+}

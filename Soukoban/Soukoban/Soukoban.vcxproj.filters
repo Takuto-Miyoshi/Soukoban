@@ -69,5 +69,6 @@
     <ClInclude Include="Source\Manager\GameManager.h">
       <Filter>ソース ファイル\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="Source\ImagesDefinition.h" />
   </ItemGroup>
 </Project>

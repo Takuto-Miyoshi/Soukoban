@@ -17,6 +17,14 @@ public:
 private:
 	void Input();
 
+	void LoadMem();
+
+private:
+	struct GraphHandle{
+		static int backGround;
+		static int guide;
+	};
+
 };
 
 #endif RESULT_SCENE_H

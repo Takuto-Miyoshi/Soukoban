@@ -13,8 +13,8 @@ enum SceneID{
 };
 
 // ステージのサイズ
-const int STAGE_WIDTH = 11;
-const int STAGE_HEIGHT = 13;
+const int STAGE_WIDTH = 13;
+const int STAGE_HEIGHT = 15;
 
 // マップチップのサイズ
 const int CHIP_WIDTH = 32;

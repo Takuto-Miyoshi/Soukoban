@@ -5,6 +5,7 @@
 #include "../Script/TitleScene.h"
 #include "../Script/InGameScene.h"
 #include "../Script/ResultScene.h"
+#include "DxLib.h"
 
 SceneID SceneManager::nextSceneID = SceneID::ID_Invalid;
 
@@ -24,6 +25,8 @@ void SceneManager::Exec(){
 	pScene->Exec();
 	if( pScene->IsEnd() ){
 		delete pScene;
+		InitGraph();
+		InitSoundMem();
 		pScene = CreateNextScene();
 	}
 }

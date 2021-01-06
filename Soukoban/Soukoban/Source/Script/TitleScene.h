@@ -19,6 +19,15 @@ private:
 
 	void Input();
 
+	void LoadMem();
+
+private:
+	struct GraphHandle
+	{
+		static int backGround;
+		static int guide;
+	};
+
 };
 
 #endif TITLE_SCENE_H

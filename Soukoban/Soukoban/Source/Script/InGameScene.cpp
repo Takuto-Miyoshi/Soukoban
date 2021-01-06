@@ -4,6 +4,7 @@
 #include "../Manager/SceneManager.h"
 #include "../Manager/InputManager.h"
 #include "../Manager/GameManager.h"
+#include "../ImagesDefinition.h"
 
 enum{
 	Step_StartJingle,
@@ -13,26 +14,31 @@ enum{
 };
 
 const int SampleStage[STAGE_HEIGHT][STAGE_WIDTH] = {
-	0,0,0,1,1,1,1,1,0,0,0,
-	0,0,0,1,3,3,3,1,0,0,0,
-	0,0,0,1,0,0,0,1,0,0,0,
-	0,0,0,1,0,0,0,1,0,0,0,
-	1,1,1,1,1,0,1,1,1,1,1,
-	1,0,0,4,0,0,1,0,0,0,1,
-	1,0,1,0,0,4,0,4,0,0,1,
-	1,0,0,0,1,1,1,0,0,0,1,
-	1,1,1,0,1,0,1,0,1,1,1,
-	0,0,1,0,1,0,1,0,1,0,0,
-	0,0,1,0,0,0,0,0,1,0,0,
-	0,0,1,0,0,2,0,0,1,0,0,
-	0,0,1,1,1,0,1,1,1,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,1,1,1,1,1,0,0,0,0,
+	0,0,0,0,1,3,3,3,1,0,0,0,0,
+	0,0,0,0,1,0,0,0,1,0,0,0,0,
+	0,0,0,0,1,0,0,0,1,0,0,0,0,
+	0,1,1,1,1,1,0,1,1,1,1,1,0,
+	0,1,0,0,4,0,0,1,0,0,0,1,0,
+	0,1,0,1,0,0,4,0,4,0,0,1,0,
+	0,1,0,0,0,1,1,1,0,0,0,1,0,
+	0,1,1,1,0,1,0,1,0,1,1,1,0,
+	0,0,0,1,0,1,0,1,0,1,0,0,0,
+	0,0,0,1,0,0,0,0,0,1,0,0,0,
+	0,0,0,1,0,0,2,0,0,1,0,0,0,
+	0,0,0,1,1,1,0,1,1,1,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,
 };
+
+int InGameScene::GraphHandle::clear = 0;
 
 InGameScene::InGameScene():playerX( 0 ), playerY( 0 ){
 
 	Reset();
 
 	step = Step_StartJingle;
+	LoadMem();
 }
 
 InGameScene::~InGameScene(){
@@ -58,6 +64,9 @@ void InGameScene::Exec(){
 }
 
 void InGameScene::Draw(){
+
+	DrawUI();
+
 	// ステージの中身と、プレイヤーを描画(DXライブラリのDrawBoxを使用)
 // 	int DrawBox( int x1 , int y1 , int x2 , int y2 , unsigned int Color , int FillFlag );
 
@@ -87,10 +96,8 @@ void InGameScene::Draw(){
 	DrawBox( playerX * CHIP_WIDTH, playerY * CHIP_HEIGHT, playerX * CHIP_WIDTH + CHIP_WIDTH, playerY * CHIP_HEIGHT + CHIP_HEIGHT, GetColor( 255, 255, 0 ), true );
 
 	if( IsClear() ){
-		DrawString( 400, 240, "!! Game Clear !!", GetColor( 255, 255, 0 ) );
+		DrawGraph( Images::UI::clear.drawCenterX, Images::UI::clear.drawCenterY, GraphHandle::clear, true );
 	}
-
-	DrawString( 20, 20, "InGameScene", GetColor( 0, 0, 0 ) );
 }
 
 bool InGameScene::IsEnd() const{
@@ -244,4 +251,23 @@ void InGameScene::AddTime(){
 			instance->SetSec( 0 );
 		}
 	}
+}
+
+void InGameScene::DrawUI(){
+	DrawBox( 416, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GetColor( 192, 72, 0 ), true );
+
+	DrawString( 500, 30, "倉庫番", GetColor( 0, 0, 0 ) );
+	DrawFormatString( 430, 80, GetColor( 0, 0, 0 ), "経過時間 : %02d分 %02d秒", GameManager::GetInstance()->GetMin(), GameManager::GetInstance()->GetSec() );
+	DrawFormatString( 430, 110, GetColor( 0, 0, 0 ), "移動回数 : %d回", GameManager::GetInstance()->GetTurn() );
+
+	DrawString( 430, 150, " ↑ : 上移動", GetColor( 0, 0, 0 ) );
+	DrawString( 430, 170, " ↓ : 下移動", GetColor( 0, 0, 0 ) );
+	DrawString( 430, 190, " → : 右移動", GetColor( 0, 0, 0 ) );
+	DrawString( 430, 210, " ← : 左移動", GetColor( 0, 0, 0 ) );
+	DrawString( 430, 230, "  R : リセット", GetColor( 0, 0, 0 ) );
+	DrawString( 430, 250, "esc : 終了", GetColor( 0, 0, 0 ) );
+}
+
+void InGameScene::LoadMem(){
+	GraphHandle::clear = LoadGraph( Images::UI::clear.path );
 }

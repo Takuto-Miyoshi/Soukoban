@@ -29,6 +29,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Definition.h" />
+    <ClInclude Include="Source\ImagesDefinition.h" />
     <ClInclude Include="Source\KeyDefinition.h" />
     <ClInclude Include="Source\Manager\GameManager.h" />
     <ClInclude Include="Source\Manager\InputManager.h" />
