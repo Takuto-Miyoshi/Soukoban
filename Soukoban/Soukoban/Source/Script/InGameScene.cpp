@@ -6,6 +6,7 @@
 #include "../Manager/GameManager.h"
 #include "../ImagesDefinition.h"
 #include "../Manager/TextureManager.h"
+#include "../Manager/SoundManager.h"
 
 enum{
 	Step_StartJingle,
@@ -112,14 +113,26 @@ void InGameScene::Input(){
 
 	InputManager* pInputMng = InputManager::GetInstance();
 
-	if( pInputMng->IsPush( KeyType::Key_Reset ) )		Reset();
+	if( pInputMng->IsPush( KeyType::Key_Reset ) ){
+		PlaySoundMem( SoundManager::GetInstance()->GetSoundHandle( SoundList::Reset ), DX_PLAYTYPE_BACK );
+		Reset();
+	}
 	else if( pInputMng->IsPush( KeyType::Key_Up ) )		Move( DirType::Dir_Up );
 	else if( pInputMng->IsPush( KeyType::Key_Down ) )	Move( DirType::Dir_Down );
 	else if( pInputMng->IsPush( KeyType::Key_Left ) )	Move( DirType::Dir_Left );
 	else if( pInputMng->IsPush( KeyType::Key_Right ) )	Move( DirType::Dir_Right );
 
 	if( IsClear() ){
+		PlaySoundMem( SoundManager::GetInstance()->GetSoundHandle( SoundList::Clear ), DX_PLAYTYPE_BACK );
 		step = Step_ClearJingle;
+	}
+
+	if( pInputMng->IsPush( KeyType::Key_Dog ) ){
+		PlaySoundMem( SoundManager::GetInstance()->GetSoundHandle( SoundList::Dog ), DX_PLAYTYPE_BACK );
+	}
+
+	if( pInputMng->IsPush( KeyType::Key_Cat ) ){
+		PlaySoundMem( SoundManager::GetInstance()->GetSoundHandle( SoundList::Cat ), DX_PLAYTYPE_BACK );
 	}
 }
 
@@ -190,12 +203,16 @@ void InGameScene::Move( DirType dir ){
 		break;
 	}
 
+	static SoundManager* sound = SoundManager::GetInstance();
+
 	// 移動先が画面外ならreturn
 	if( nextX < 0 || nextY < 0 || nextX > ( STAGE_WIDTH - 1 ) || nextY > ( STAGE_HEIGHT - 1 ) ){
+		PlaySoundMem( sound->GetSoundHandle( SoundList::RunToWall ), DX_PLAYTYPE_BACK );
 		return;
 	}
 
 	if( stageData[nextY][nextX] == ObjectType::Obj_Ground || stageData[nextY][nextX] == ObjectType::Obj_Target ){
+		PlaySoundMem( sound->GetSoundHandle( SoundList::RunToFloor ), DX_PLAYTYPE_BACK );
 		playerX = nextX;
 		playerY = nextY;
 		GameManager::GetInstance()->SetTurn( GameManager::GetInstance()->GetTurn() + 1 );
@@ -204,11 +221,13 @@ void InGameScene::Move( DirType dir ){
 	else if( stageData[nextY][nextX] == ObjectType::Obj_UnsetCrate || stageData[nextY][nextX] == ObjectType::Obj_SetCrate ){
 		// 画面外チェック
 		if( next2X < 0 || next2Y < 0 || next2X > ( STAGE_WIDTH - 1 ) || next2Y > ( STAGE_HEIGHT - 1 ) ){
+			PlaySoundMem( sound->GetSoundHandle( SoundList::RunToWall ), DX_PLAYTYPE_BACK );
 			return;
 		}
 
 		// 移動できるマップチップでない場合はreturn
 		if( stageData[next2Y][next2X] != ObjectType::Obj_Ground && stageData[next2Y][next2X] != ObjectType::Obj_Target ){
+			PlaySoundMem( sound->GetSoundHandle( SoundList::RunToWall ), DX_PLAYTYPE_BACK );
 			return;
 		}
 
@@ -222,9 +241,11 @@ void InGameScene::Move( DirType dir ){
 
 		// 箱を移動させる
 		if( stageData[next2Y][next2X] == ObjectType::Obj_Ground ){
+			PlaySoundMem( sound->GetSoundHandle( SoundList::CrateToFloor ), DX_PLAYTYPE_BACK );
 			stageData[next2Y][next2X] = ObjectType::Obj_UnsetCrate;
 		}
 		else{
+			PlaySoundMem( sound->GetSoundHandle( SoundList::CrateToTarget ), DX_PLAYTYPE_BACK );
 			stageData[next2Y][next2X] = ObjectType::Obj_SetCrate;
 		}
 
@@ -232,6 +253,9 @@ void InGameScene::Move( DirType dir ){
 		playerX = nextX;
 		playerY = nextY;
 		GameManager::GetInstance()->SetTurn( GameManager::GetInstance()->GetTurn() + 1 );
+	}
+	else{
+		PlaySoundMem( sound->GetSoundHandle( SoundList::RunToWall ), DX_PLAYTYPE_BACK );
 	}
 
 }

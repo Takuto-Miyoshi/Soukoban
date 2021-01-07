@@ -4,6 +4,7 @@
 #include "Manager/InputManager.h"
 #include "Manager/GameManager.h"
 #include "Manager/TextureManager.h"
+#include "Manager/SoundManager.h"
 
 int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow ){
 
@@ -21,6 +22,7 @@ int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	GameManager::CreateInstance();
 	InputManager::CreateInstance();
 	TextureManager::CreateInstance();
+	SoundManager::CreateInstance();
 	SceneManager::CreateInstance();
 
 	// メインループ
@@ -45,6 +47,7 @@ int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 	}
 
 	SceneManager::DestroyInstance();
+	SoundManager::DestroyInstance();
 	TextureManager::DestroyInstance();
 	InputManager::DestroyInstance();
 	GameManager::DestroyInstance();

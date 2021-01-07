@@ -6,6 +6,7 @@
 #include "../Script/InGameScene.h"
 #include "../Script/ResultScene.h"
 #include "TextureManager.h"
+#include "SoundManager.h"
 #include "DxLib.h"
 
 SceneID SceneManager::nextSceneID = SceneID::ID_Invalid;
@@ -42,22 +43,30 @@ void SceneManager::SetNextScene( SceneID next ){
 
 SceneBase* SceneManager::CreateNextScene(){
 	SceneBase* next = nullptr;
+	TextureManager* texture = TextureManager::GetInstance();
+	SoundManager* sound = SoundManager::GetInstance();
+
 	switch( nextSceneID )
 	{
 	case SceneID::ID_Title:
 		next = new TitleScene();
-		TextureManager::GetInstance()->LoadGraphHandle( SceneID::ID_Title );
+		texture->LoadGraphHandle( SceneID::ID_Title );
+		sound->LoadSoundHandle( SceneID::ID_Title );
 		break;
 	case SceneID::ID_InGame:
 		next = new InGameScene();
-		TextureManager::GetInstance()->LoadGraphHandle( SceneID::ID_InGame );
+		texture->LoadGraphHandle( SceneID::ID_InGame );
+		sound->LoadSoundHandle( SceneID::ID_InGame );
 		break;
 	case SceneID::ID_Result:
 		next = new ResultScene();
-		TextureManager::GetInstance()->LoadGraphHandle( SceneID::ID_Result );
+		texture->LoadGraphHandle( SceneID::ID_Result );
+		sound->LoadSoundHandle( SceneID::ID_Result );
 		break;
 	default:		break;
 	}
+
+	PlaySoundMem( sound->GetBGMHandle(), DX_PLAYTYPE_LOOP );
 
 	return next;
 }

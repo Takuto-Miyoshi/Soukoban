@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Manager\GameManager.cpp" />
     <ClCompile Include="Source\Manager\SceneManager.cpp" />
+    <ClCompile Include="Source\Manager\SoundManager.cpp" />
     <ClCompile Include="Source\Manager\TextureManager.cpp" />
     <ClCompile Include="Source\Script\InGameScene.cpp" />
     <ClCompile Include="Source\Script\ResultScene.cpp" />
@@ -35,12 +36,14 @@
     <ClInclude Include="Source\Manager\GameManager.h" />
     <ClInclude Include="Source\Manager\InputManager.h" />
     <ClInclude Include="Source\Manager\SceneManager.h" />
+    <ClInclude Include="Source\Manager\SoundManager.h" />
     <ClInclude Include="Source\Manager\TextureManager.h" />
     <ClInclude Include="Source\Script\InGameScene.h" />
     <ClInclude Include="Source\Script\ResultScene.h" />
     <ClInclude Include="Source\Script\SceneBase.h" />
     <ClInclude Include="Source\Script\TitleScene.h" />
     <ClInclude Include="Source\Singleton.h" />
+    <ClInclude Include="Source\SoundsDefinition.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Manager\InputManager.cpp" />

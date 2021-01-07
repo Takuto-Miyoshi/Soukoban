@@ -6,6 +6,7 @@
 #include "../Manager/GameManager.h"
 #include "../ImagesDefinition.h"
 #include "../Manager/TextureManager.h"
+#include "../Manager/SoundManager.h"
 
 enum{
 	Step_Input,
@@ -54,6 +55,7 @@ bool ResultScene::IsEnd() const{
 
 void ResultScene::Input(){
 	if( InputManager::GetInstance()->IsPush( KeyType::Key_Enter ) ){
+		PlaySoundMem( SoundManager::GetInstance()->GetSoundHandle( SoundList::Enter ), DX_PLAYTYPE_NORMAL );
 		step = Step_End;
 		SceneManager::GetInstance()->SetNextScene( SceneID::ID_Title );
 	}
