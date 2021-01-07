@@ -15,25 +15,25 @@ enum{
 	Step_End
 };
 
-const int SampleStage[STAGE_HEIGHT][STAGE_WIDTH] = {
-	0,0,0,0,0,0,0,0,0,0,0,0,0,
-	0,0,0,0,1,1,1,1,1,0,0,0,0,
-	0,0,0,0,1,3,3,3,1,0,0,0,0,
-	0,0,0,0,1,0,0,0,1,0,0,0,0,
-	0,0,0,0,1,0,0,0,1,0,0,0,0,
-	0,1,1,1,1,1,0,1,1,1,1,1,0,
-	0,1,0,0,4,0,0,1,0,0,0,1,0,
-	0,1,0,1,0,0,4,0,4,0,0,1,0,
-	0,1,0,0,0,1,1,1,0,0,0,1,0,
-	0,1,1,1,0,1,0,1,0,1,1,1,0,
-	0,0,0,1,0,1,0,1,0,1,0,0,0,
-	0,0,0,1,0,0,0,0,0,1,0,0,0,
-	0,0,0,1,0,0,2,0,0,1,0,0,0,
-	0,0,0,1,1,1,1,1,1,1,0,0,0,
-	0,0,0,0,0,0,0,0,0,0,0,0,0,
+const std::vector<std::vector<int>> sampleStage = {
+	{0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,1,1,1,1,1,0,0,0,0},
+	{0,0,0,0,1,3,3,3,1,0,0,0,0},
+	{0,0,0,0,1,0,0,0,1,0,0,0,0},
+	{0,0,0,0,1,0,0,0,1,0,0,0,0},
+	{0,1,1,1,1,1,0,1,1,1,1,1,0},
+	{0,1,0,0,4,0,0,1,0,0,0,1,0},
+	{0,1,0,1,0,0,4,0,4,0,0,1,0},
+	{0,1,0,0,0,1,1,1,0,0,0,1,0},
+	{0,1,1,1,0,1,0,1,0,1,1,1,0},
+	{0,0,0,1,0,1,0,1,0,1,0,0,0},
+	{0,0,0,1,0,0,0,0,0,1,0,0,0},
+	{0,0,0,1,0,0,2,0,0,1,0,0,0},
+	{0,0,0,1,1,1,1,1,1,1,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0},
 };
 
-InGameScene::InGameScene():playerX( 0 ), playerY( 0 ){
+InGameScene::InGameScene() :playerPos( { 0, 0 } ){
 
 	Reset();
 
@@ -81,15 +81,15 @@ void InGameScene::Draw(){
 
 	for( int y = 0; y < STAGE_HEIGHT; y++ ){
 		for( int x = 0; x < STAGE_WIDTH; x++ ){
-			int handleTemp = instance->GetObjectHandle( stageData[y][x] );
-			if( stageData[y][x] == ObjectType::Obj_Player ) handleTemp = instance->GetObjectHandle( ObjectType::Obj_Ground );
+			int handleTemp = instance->GetObjectHandle( stageData.at( y ).at( x ) );
+			if( stageData.at( y ).at( x ) == ObjectType::Obj_Player ) handleTemp = instance->GetObjectHandle( ObjectType::Obj_Ground );
 
 			DrawGraph( x * CHIP_WIDTH, y * CHIP_HEIGHT, handleTemp, false );
 		}
 	}
 
 	// プレイヤーの描画
-	DrawGraph( playerX * CHIP_WIDTH, playerY * CHIP_HEIGHT, instance->GetObjectHandle( ObjectType::Obj_Player ), true );
+	DrawGraph( playerPos.x * CHIP_WIDTH, playerPos.y * CHIP_HEIGHT, instance->GetObjectHandle( ObjectType::Obj_Player ), true );
 
 	// クリア表示 & Enterキーを押すように誘導(1秒間隔で点滅)
 	static int flashingCounter = 0;
@@ -134,6 +134,10 @@ void InGameScene::Input(){
 	if( pInputMng->IsPush( KeyType::Key_Cat ) ){
 		PlaySoundMem( SoundManager::GetInstance()->GetSoundHandle( SoundList::Cat ), DX_PLAYTYPE_BACK );
 	}
+
+	if( pInputMng->IsPush( KeyType::Key_Back ) ){
+		BackOneStep();
+	}
 }
 
 void InGameScene::ClearJingle(){
@@ -146,7 +150,7 @@ void InGameScene::ClearJingle(){
 bool InGameScene::IsClear() const {
 	for( int y = 0; y < STAGE_HEIGHT; y++ ){
 		for( int x = 0; x < STAGE_WIDTH; x++ ){
-			if( stageData[y][x] == ObjectType::Obj_UnsetCrate ){
+			if( stageData.at( y ).at( x ) == ObjectType::Obj_UnsetCrate ){
 				return false;
 			}
 		}
@@ -156,16 +160,20 @@ bool InGameScene::IsClear() const {
 }
 
 void InGameScene::Reset(){
+	stageData = sampleStage;
+
 	for( int y = 0; y < STAGE_HEIGHT; y++ ){
 		for( int x = 0; x < STAGE_WIDTH; x++ ){
-			stageData[y][x] = SampleStage[y][x];
-			if( stageData[y][x] == ObjectType::Obj_Player ){
-				playerX = x;
-				playerY = y;
-				stageData[y][x] = ObjectType::Obj_Ground;
+			if( stageData.at( y ).at( x ) == ObjectType::Obj_Player ){
+				playerPos = { x, y };
+				stageData.at( y ).at( x ) = ObjectType::Obj_Ground;
+				break;
 			}
 		}
 	}
+
+	stageLog.resize( 0 );
+	playerLog.resize( 0 );
 
 	GameManager::GetInstance()->SetMin( 0 );
 	GameManager::GetInstance()->SetSec( 0 );
@@ -178,86 +186,90 @@ void InGameScene::Move( DirType dir ){
 		return;
 	}
 
-	int nextX = playerX;
-	int nextY = playerY;
-	int next2X = playerX;
-	int next2Y = playerY;
+	Position next = playerPos;
+	Position next2 = playerPos;
 
 	switch( dir )
 	{
 	case Dir_Up:
-		nextY -= 1;
-		next2Y -= 2;
+		next.y -= 1;
+		next2.y -= 2;
 		break;
 	case Dir_Down:
-		nextY += 1;
-		next2Y += 2;
+		next.y += 1;
+		next2.y += 2;
 		break;
 	case Dir_Left:
-		nextX -= 1;
-		next2X -= 2;
+		next.x -= 1;
+		next2.x -= 2;
 		break;
 	case Dir_Right:
-		nextX += 1;
-		next2X += 2;
+		next.x += 1;
+		next2.x += 2;
 		break;
 	}
 
 	static SoundManager* sound = SoundManager::GetInstance();
 
 	// 移動先が画面外ならreturn
-	if( nextX < 0 || nextY < 0 || nextX > ( STAGE_WIDTH - 1 ) || nextY > ( STAGE_HEIGHT - 1 ) ){
+	if( next.x < 0 || next.y < 0 || next.x > ( STAGE_WIDTH - 1 ) || next.y > ( STAGE_HEIGHT - 1 ) ){
 		PlaySoundMem( sound->GetSoundHandle( SoundList::RunToWall ), DX_PLAYTYPE_BACK );
 		return;
 	}
 
-	if( stageData[nextY][nextX] == ObjectType::Obj_Ground || stageData[nextY][nextX] == ObjectType::Obj_Target ){
+	if( stageData.at(next.y).at(next.x) == ObjectType::Obj_Ground || stageData.at( next.y ).at( next.x ) == ObjectType::Obj_Target ){
 		PlaySoundMem( sound->GetSoundHandle( SoundList::RunToFloor ), DX_PLAYTYPE_BACK );
-		playerX = nextX;
-		playerY = nextY;
+
+		// この時点での配置を保存
+		playerLog.push_back( playerPos );
+		stageLog.push_back( stageData );
+
+		playerPos = next;
 		GameManager::GetInstance()->SetTurn( GameManager::GetInstance()->GetTurn() + 1 );
 	}
 	// 移動先が箱の場合
-	else if( stageData[nextY][nextX] == ObjectType::Obj_UnsetCrate || stageData[nextY][nextX] == ObjectType::Obj_SetCrate ){
+	else if( stageData.at( next.y ).at( next.x ) == ObjectType::Obj_UnsetCrate || stageData.at( next.y ).at( next.x ) == ObjectType::Obj_SetCrate ){
 		// 画面外チェック
-		if( next2X < 0 || next2Y < 0 || next2X > ( STAGE_WIDTH - 1 ) || next2Y > ( STAGE_HEIGHT - 1 ) ){
+		if( next2.x < 0 || next2.y < 0 || next2.x >( STAGE_WIDTH - 1 ) || next2.y >( STAGE_HEIGHT - 1 ) ){
 			PlaySoundMem( sound->GetSoundHandle( SoundList::RunToWall ), DX_PLAYTYPE_BACK );
 			return;
 		}
 
 		// 移動できるマップチップでない場合はreturn
-		if( stageData[next2Y][next2X] != ObjectType::Obj_Ground && stageData[next2Y][next2X] != ObjectType::Obj_Target ){
+		if( stageData.at( next2.y ).at( next2.x ) != ObjectType::Obj_Ground && stageData.at( next2.y ).at( next2.x ) != ObjectType::Obj_Target ){
 			PlaySoundMem( sound->GetSoundHandle( SoundList::RunToWall ), DX_PLAYTYPE_BACK );
 			return;
 		}
 
+		// この時点での配置を保存
+		playerLog.push_back( playerPos );
+		stageLog.push_back( stageData );
+
 		// となりの位置を変更する
-		if( stageData[nextY][nextX] == ObjectType::Obj_UnsetCrate ){
-			stageData[nextY][nextX] = ObjectType::Obj_Ground;
+		if( stageData.at( next.y ).at( next.x ) == ObjectType::Obj_UnsetCrate ){
+			stageData.at( next.y ).at( next.x ) = ObjectType::Obj_Ground;
 		}
 		else{
-			stageData[nextY][nextX] = ObjectType::Obj_Target;
+			stageData.at( next.y ).at( next.x ) = ObjectType::Obj_Target;
 		}
 
 		// 箱を移動させる
-		if( stageData[next2Y][next2X] == ObjectType::Obj_Ground ){
+		if( stageData.at( next2.y ).at( next2.x ) == ObjectType::Obj_Ground ){
 			PlaySoundMem( sound->GetSoundHandle( SoundList::CrateToFloor ), DX_PLAYTYPE_BACK );
-			stageData[next2Y][next2X] = ObjectType::Obj_UnsetCrate;
+			stageData.at( next2.y ).at( next2.x ) = ObjectType::Obj_UnsetCrate;
 		}
 		else{
 			PlaySoundMem( sound->GetSoundHandle( SoundList::CrateToTarget ), DX_PLAYTYPE_BACK );
-			stageData[next2Y][next2X] = ObjectType::Obj_SetCrate;
+			stageData.at( next2.y ).at( next2.x ) = ObjectType::Obj_SetCrate;
 		}
 
 		// プレイヤーの移動
-		playerX = nextX;
-		playerY = nextY;
+		playerPos = next;
 		GameManager::GetInstance()->SetTurn( GameManager::GetInstance()->GetTurn() + 1 );
 	}
 	else{
 		PlaySoundMem( sound->GetSoundHandle( SoundList::RunToWall ), DX_PLAYTYPE_BACK );
 	}
-
 }
 
 void InGameScene::AddTime(){
@@ -290,4 +302,19 @@ void InGameScene::DrawUI(){
 	DrawString( 430, 210, " ← : 左移動", GetColor( 0, 0, 0 ) );
 	DrawString( 430, 230, "  R : リセット", GetColor( 0, 0, 0 ) );
 	DrawString( 430, 250, "esc : 終了", GetColor( 0, 0, 0 ) );
+}
+
+void InGameScene::BackOneStep(){
+
+	if( GameManager::GetInstance()->GetTurn() == 0 ) return;
+
+	stageData = stageLog.back();
+	stageLog.pop_back();
+
+	playerPos = playerLog.back();
+	playerLog.pop_back();
+
+	PlaySoundMem( SoundManager::GetInstance()->GetSoundHandle( SoundList::Back ), DX_PLAYTYPE_BACK );
+
+	GameManager::GetInstance()->SetTurn( GameManager::GetInstance()->GetTurn() - 1 );
 }

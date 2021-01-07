@@ -12,6 +12,7 @@ enum KeyType
 	Key_Right,	// 右移動
 	Key_Enter,	// 決定
 	Key_Reset,	// リセット
+	Key_Back,	// 一手戻す
 	Key_Dog,	// わん
 	Key_Cat,	// にゃー
 
@@ -25,6 +26,7 @@ const int KEY_ASSIGN[KeyType::Key_Max] = {
 	KEY_INPUT_RIGHT,	//			Right
 	KEY_INPUT_RETURN,	//			Enter
 	KEY_INPUT_R,		//			Reset
+	KEY_INPUT_B,		//			Back
 	KEY_INPUT_D,		//			Dog
 	KEY_INPUT_C			//			Cat
 };

@@ -2,6 +2,8 @@
 #ifndef IN_GAME_SCENE_H
 #define IN_GAME_SCENE_H
 
+#include <vector>
+
 #include "SceneBase.h"
 #include "../Definition.h"
 
@@ -39,11 +41,16 @@ private:
 	// UIの表示
 	void DrawUI();
 
+	// 一手戻す
+	void BackOneStep();
+
 private:
-	int stageData[STAGE_HEIGHT][STAGE_WIDTH];
-	int playerX;
-	int playerY;
+	Position playerPos;
 	int frameCounter;
+
+	std::vector<std::vector<int>> stageData;
+	std::vector<std::vector<std::vector<int>>> stageLog;
+	std::vector<Position> playerLog;
 };
 
 #endif IN_GAME_SCENE_H

@@ -13,6 +13,7 @@ enum class SoundList{
 	RunToWall,
 	CrateToFloor,
 	CrateToTarget,
+	Back,
 	Dog,
 	Cat
 };
@@ -37,6 +38,7 @@ private:
 	int runToWall;
 	int crateToFloor;
 	int crateToTarget;
+	int back;
 	int dog;
 	int cat;
 };

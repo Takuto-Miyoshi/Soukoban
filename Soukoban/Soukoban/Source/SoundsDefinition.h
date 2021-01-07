@@ -19,6 +19,7 @@ namespace Sounds{
 		const LPCTSTR runToWall = "Sounds/Run_Wall.mp3";
 		const LPCTSTR crateToFloor = "Sounds/Crate_Floor.mp3";
 		const LPCTSTR crateToTarget = "Sounds/Crate_Target.mp3";
+		const LPCTSTR back = "Sounds/Back.mp3";
 		const LPCTSTR dog = "Sounds/D.mp3";
 		const LPCTSTR cat = "Sounds/C.mp3";
 	}

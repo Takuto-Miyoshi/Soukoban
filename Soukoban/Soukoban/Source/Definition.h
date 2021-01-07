@@ -44,4 +44,13 @@ enum DirType{
 	Dir_Max
 };
 
+struct Position{
+	int x;
+	int y;
+
+	bool operator == ( Position pos ){
+		return ( x == pos.x && y == pos.y );
+	}
+};
+
 #endif // !DEFINITION_H

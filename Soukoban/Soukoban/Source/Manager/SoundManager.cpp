@@ -13,6 +13,7 @@ SoundManager::SoundManager() :
 	runToWall( 0 ),
 	crateToFloor( 0 ),
 	crateToTarget( 0 ),
+	back( 0 ),
 	dog( 0 ),
 	cat( 0 )
 {
@@ -43,6 +44,7 @@ void SoundManager::LoadSoundHandle( SceneID scene ){
 		crateToFloor = LoadSoundMem( Sounds::SE::crateToFloor );
 		ChangeVolumeSoundMem( 160, crateToFloor );
 		crateToTarget = LoadSoundMem( Sounds::SE::crateToTarget );
+		back = LoadSoundMem( Sounds::SE::back );
 		dog = LoadSoundMem( Sounds::SE::dog );
 		cat = LoadSoundMem( Sounds::SE::cat );
 		break;
@@ -67,6 +69,7 @@ int SoundManager::GetSoundHandle( SoundList sound ) const{
 	case SoundList::RunToWall:		return runToWall;
 	case SoundList::CrateToFloor:	return crateToFloor;
 	case SoundList::CrateToTarget:	return crateToTarget;
+	case SoundList::Back:			return back;
 	case SoundList::Dog:			return dog;
 	case SoundList::Cat:			return cat;
 	default: return 0;
