@@ -1,5 +1,4 @@
 ﻿
-#include <fstream>
 #include <iostream>
 
 #include "InGameScene.h"
@@ -19,10 +18,7 @@ enum{
 };
 
 InGameScene::InGameScene() :playerPos( { 0, 0 } ){
-
-	LoadStage();
 	Reset();
-
 	step = Step_StartJingle;
 }
 
@@ -146,7 +142,7 @@ bool InGameScene::IsClear() const {
 
 void InGameScene::Reset(){
 
-	stageData = loadedStage;
+	stageData = GameManager::GetInstance()->GetFileVector().at( GameManager::GetInstance()->GetSelectStageNum() ).mapData;
 
 	for( int y = 0; y < STAGE_HEIGHT; y++ ){
 		for( int x = 0; x < STAGE_WIDTH; x++ ){
@@ -280,7 +276,8 @@ void InGameScene::AddTime(){
 void InGameScene::DrawUI(){
 	DrawBox( 416, 0, WINDOW_WIDTH, WINDOW_HEIGHT, Color::brown, true );
 
-	DrawString( 500, 30, "倉庫番", Color::black );
+	std::string strTemp = GameManager::GetInstance()->GetFileVector().at( GameManager::GetInstance()->GetSelectStageNum() ).stageTitle;
+	DrawString( 528 - strTemp.length() * GetFontSize() / 4, 30, strTemp.c_str(), Color::black );
 	DrawFormatString( 430, 80, Color::black, "経過時間 : %02d分 %02d秒", GameManager::GetInstance()->GetMin(), GameManager::GetInstance()->GetSec() );
 	DrawFormatString( 430, 110, Color::black, "移動回数 : %d回", GameManager::GetInstance()->GetTurn() );
 
@@ -308,42 +305,4 @@ void InGameScene::BackOneStep(){
 	PlaySoundMem( SoundManager::GetInstance()->GetSoundHandle( SoundList::Back ), DX_PLAYTYPE_BACK );
 
 	GameManager::GetInstance()->SetTurn( GameManager::GetInstance()->GetTurn() - 1 );
-}
-
-void InGameScene::LoadStage(){
-
-	std::ifstream file( "StageData.txt" );
-	std::string lineTemp;
-	bool readMode = false;
-	int y = 0;
-
-	loadedStage.resize( STAGE_HEIGHT, std::vector<int>( STAGE_WIDTH ) );
-
-	while( true ){
-
-		std::getline( file, lineTemp );
-
-		if( lineTemp.find( "//" ) != -1 );
-		else if( lineTemp.find( "/start" ) != -1 ){
-			readMode = true;
-			std::getline( file, lineTemp );
-		}
-		else if( lineTemp.find( "/end" ) != -1 ){
-			break;
-		}
-
-		if( readMode == true ){
-			for( int x = 0; x < STAGE_WIDTH; x++ ){
-				EntryMapChip( y, x, lineTemp );
-			}
-			y++;
-		}
-	}
-}
-
-inline void InGameScene::EntryMapChip( int y, int x, std::string lineTemp ){
-	if( !( lineTemp.at( x ) >= 48 && lineTemp.at( x ) <= 52 ) ) return;
-
-	loadedStage.at( y ).at( x ) = lineTemp.at( x ) - 48;
-	if( loadedStage.at( y ).at( x ) > ObjectType::Obj_UnsetCrate || loadedStage.at( y ).at( x ) < ObjectType::Obj_Ground ) loadedStage.at( y ).at( x ) = 0;
 }

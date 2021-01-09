@@ -45,6 +45,7 @@ SceneBase* SceneManager::CreateNextScene(){
 	SceneBase* next = nullptr;
 	TextureManager* texture = TextureManager::GetInstance();
 	SoundManager* sound = SoundManager::GetInstance();
+	SetFontSize( 16 );
 
 	switch( nextSceneID )
 	{

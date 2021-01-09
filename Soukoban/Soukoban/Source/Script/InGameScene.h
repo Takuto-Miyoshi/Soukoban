@@ -45,16 +45,10 @@ private:
 	// 一手戻す
 	void BackOneStep();
 
-	// ステージのロード
-	void LoadStage();
-
-	inline void EntryMapChip( int y, int x, std::string lineTemp );
-
 private:
 	Position playerPos;
 	int frameCounter;
 
-	std::vector<std::vector<int>> loadedStage;
 	std::vector<std::vector<int>> stageData;
 	std::vector<std::vector<std::vector<int>>> stageLog;
 	std::vector<Position> playerLog;
