@@ -1,4 +1,7 @@
 ﻿
+#include <fstream>
+#include <iostream>
+
 #include "InGameScene.h"
 #include "DxLib.h"
 #include "../Manager/SceneManager.h"
@@ -15,26 +18,9 @@ enum{
 	Step_End
 };
 
-const std::vector<std::vector<int>> sampleStage = {
-	{0,0,0,0,0,0,0,0,0,0,0,0,0},
-	{0,0,0,0,1,1,1,1,1,0,0,0,0},
-	{0,0,0,0,1,3,3,3,1,0,0,0,0},
-	{0,0,0,0,1,0,0,0,1,0,0,0,0},
-	{0,0,0,0,1,0,0,0,1,0,0,0,0},
-	{0,1,1,1,1,1,0,1,1,1,1,1,0},
-	{0,1,0,0,4,0,0,1,0,0,0,1,0},
-	{0,1,0,1,0,0,4,0,4,0,0,1,0},
-	{0,1,0,0,0,1,1,1,0,0,0,1,0},
-	{0,1,1,1,0,1,0,1,0,1,1,1,0},
-	{0,0,0,1,0,1,0,1,0,1,0,0,0},
-	{0,0,0,1,0,0,0,0,0,1,0,0,0},
-	{0,0,0,1,0,0,2,0,0,1,0,0,0},
-	{0,0,0,1,1,1,1,1,1,1,0,0,0},
-	{0,0,0,0,0,0,0,0,0,0,0,0,0},
-};
-
 InGameScene::InGameScene() :playerPos( { 0, 0 } ){
 
+	LoadStage();
 	Reset();
 
 	step = Step_StartJingle;
@@ -159,7 +145,8 @@ bool InGameScene::IsClear() const {
 }
 
 void InGameScene::Reset(){
-	stageData = sampleStage;
+
+	stageData = loadedStage;
 
 	for( int y = 0; y < STAGE_HEIGHT; y++ ){
 		for( int x = 0; x < STAGE_WIDTH; x++ ){
@@ -321,4 +308,42 @@ void InGameScene::BackOneStep(){
 	PlaySoundMem( SoundManager::GetInstance()->GetSoundHandle( SoundList::Back ), DX_PLAYTYPE_BACK );
 
 	GameManager::GetInstance()->SetTurn( GameManager::GetInstance()->GetTurn() - 1 );
+}
+
+void InGameScene::LoadStage(){
+
+	std::ifstream file( "StageData.txt" );
+	std::string lineTemp;
+	bool readMode = false;
+	int y = 0;
+
+	loadedStage.resize( STAGE_HEIGHT, std::vector<int>( STAGE_WIDTH ) );
+
+	while( true ){
+
+		std::getline( file, lineTemp );
+
+		if( lineTemp.find( "//" ) != -1 );
+		else if( lineTemp.find( "/start" ) != -1 ){
+			readMode = true;
+			std::getline( file, lineTemp );
+		}
+		else if( lineTemp.find( "/end" ) != -1 ){
+			break;
+		}
+
+		if( readMode == true ){
+			for( int x = 0; x < STAGE_WIDTH; x++ ){
+				EntryMapChip( y, x, lineTemp );
+			}
+			y++;
+		}
+	}
+}
+
+inline void InGameScene::EntryMapChip( int y, int x, std::string lineTemp ){
+	if( !( lineTemp.at( x ) >= 48 && lineTemp.at( x ) <= 52 ) ) return;
+
+	loadedStage.at( y ).at( x ) = lineTemp.at( x ) - 48;
+	if( loadedStage.at( y ).at( x ) > ObjectType::Obj_UnsetCrate || loadedStage.at( y ).at( x ) < ObjectType::Obj_Ground ) loadedStage.at( y ).at( x ) = 0;
 }
