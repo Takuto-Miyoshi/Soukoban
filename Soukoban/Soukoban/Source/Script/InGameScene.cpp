@@ -89,7 +89,14 @@ void InGameScene::Draw(){
 	}
 
 	// プレイヤーの描画
-	DrawGraph( playerPos.x * CHIP_WIDTH, playerPos.y * CHIP_HEIGHT, instance->GetObjectHandle( ObjectType::Obj_Player ), true );
+	switch( playerPos.direction ){
+	case DirType::Dir_Right:
+		DrawTurnGraph( playerPos.x * CHIP_WIDTH, playerPos.y * CHIP_HEIGHT, instance->GetObjectHandle( ObjectType::Obj_Player ), true );
+		break;
+	default:
+		DrawGraph( playerPos.x * CHIP_WIDTH, playerPos.y * CHIP_HEIGHT, instance->GetObjectHandle( ObjectType::Obj_Player ), true );
+		break;
+	}
 
 	// クリア表示 & Enterキーを押すように誘導(1秒間隔で点滅)
 	static int flashingCounter = 0;
@@ -112,31 +119,23 @@ void InGameScene::StartJingle(){
 void InGameScene::Input(){
 
 	InputManager* pInputMng = InputManager::GetInstance();
+	SoundManager* soundMng = SoundManager::GetInstance();
 
 	if( pInputMng->IsPush( KeyType::Key_Reset ) ){
-		PlaySoundMem( SoundManager::GetInstance()->GetSoundHandle( SoundList::Reset ), DX_PLAYTYPE_BACK );
+		PlaySoundMem( soundMng->GetSoundHandle( SoundList::Reset ), DX_PLAYTYPE_BACK );
 		Reset();
 	}
 	else if( pInputMng->IsPush( KeyType::Key_Up ) )		Move( DirType::Dir_Up );
 	else if( pInputMng->IsPush( KeyType::Key_Down ) )	Move( DirType::Dir_Down );
 	else if( pInputMng->IsPush( KeyType::Key_Left ) )	Move( DirType::Dir_Left );
 	else if( pInputMng->IsPush( KeyType::Key_Right ) )	Move( DirType::Dir_Right );
+	else if( pInputMng->IsPush( KeyType::Key_Dog ) )	PlaySoundMem( soundMng->GetSoundHandle( SoundList::Dog ), DX_PLAYTYPE_BACK );
+	else if( pInputMng->IsPush( KeyType::Key_Cat ) )	PlaySoundMem( soundMng->GetSoundHandle( SoundList::Cat ), DX_PLAYTYPE_BACK );
+	else if( pInputMng->IsPush( KeyType::Key_Back ) )	BackOneStep();
 
 	if( IsClear() ){
-		PlaySoundMem( SoundManager::GetInstance()->GetSoundHandle( SoundList::Clear ), DX_PLAYTYPE_BACK );
+		PlaySoundMem( soundMng->GetSoundHandle( SoundList::Clear ), DX_PLAYTYPE_BACK );
 		step = Step_ClearJingle;
-	}
-
-	if( pInputMng->IsPush( KeyType::Key_Dog ) ){
-		PlaySoundMem( SoundManager::GetInstance()->GetSoundHandle( SoundList::Dog ), DX_PLAYTYPE_BACK );
-	}
-
-	if( pInputMng->IsPush( KeyType::Key_Cat ) ){
-		PlaySoundMem( SoundManager::GetInstance()->GetSoundHandle( SoundList::Cat ), DX_PLAYTYPE_BACK );
-	}
-
-	if( pInputMng->IsPush( KeyType::Key_Back ) ){
-		BackOneStep();
 	}
 }
 
@@ -202,10 +201,12 @@ void InGameScene::Move( DirType dir ){
 	case Dir_Left:
 		next.x -= 1;
 		next2.x -= 2;
+		playerPos.direction = DirType::Dir_Left;
 		break;
 	case Dir_Right:
 		next.x += 1;
 		next2.x += 2;
+		playerPos.direction = DirType::Dir_Right;
 		break;
 	}
 
@@ -290,18 +291,21 @@ void InGameScene::AddTime(){
 }
 
 void InGameScene::DrawUI(){
-	DrawBox( 416, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GetColor( 192, 72, 0 ), true );
+	DrawBox( 416, 0, WINDOW_WIDTH, WINDOW_HEIGHT, Color::brown, true );
 
-	DrawString( 500, 30, "倉庫番", GetColor( 0, 0, 0 ) );
-	DrawFormatString( 430, 80, GetColor( 0, 0, 0 ), "経過時間 : %02d分 %02d秒", GameManager::GetInstance()->GetMin(), GameManager::GetInstance()->GetSec() );
-	DrawFormatString( 430, 110, GetColor( 0, 0, 0 ), "移動回数 : %d回", GameManager::GetInstance()->GetTurn() );
+	DrawString( 500, 30, "倉庫番", Color::black );
+	DrawFormatString( 430, 80, Color::black, "経過時間 : %02d分 %02d秒", GameManager::GetInstance()->GetMin(), GameManager::GetInstance()->GetSec() );
+	DrawFormatString( 430, 110, Color::black, "移動回数 : %d回", GameManager::GetInstance()->GetTurn() );
 
-	DrawString( 430, 150, " ↑ : 上移動", GetColor( 0, 0, 0 ) );
-	DrawString( 430, 170, " ↓ : 下移動", GetColor( 0, 0, 0 ) );
-	DrawString( 430, 190, " → : 右移動", GetColor( 0, 0, 0 ) );
-	DrawString( 430, 210, " ← : 左移動", GetColor( 0, 0, 0 ) );
-	DrawString( 430, 230, "  R : リセット", GetColor( 0, 0, 0 ) );
-	DrawString( 430, 250, "esc : 終了", GetColor( 0, 0, 0 ) );
+	DrawString( 430, 150, " ↑ : 上移動", Color::black );
+	DrawString( 430, 170, " ↓ : 下移動", Color::black );
+	DrawString( 430, 190, " → : 右移動", Color::black );
+	DrawString( 430, 210, " ← : 左移動", Color::black );
+	DrawString( 430, 230, "  B : 一手戻す", Color::black );
+	DrawString( 430, 250, "  R : リセット", Color::black );
+	DrawString( 430, 270, "esc : 終了", Color::black );
+	DrawString( 430, 310, "  D : わん", Color::black );
+	DrawString( 430, 330, "  C : にゃー", Color::black );
 }
 
 void InGameScene::BackOneStep(){

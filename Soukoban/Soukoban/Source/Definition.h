@@ -2,6 +2,8 @@
 #ifndef DEFINITION_H
 #define DEFINITION_H
 
+#include "DxLib.h"
+
 // シーンID
 enum SceneID{
 	ID_Title,		// タイトル
@@ -47,10 +49,22 @@ enum DirType{
 struct Position{
 	int x;
 	int y;
+	DirType direction;
 
 	bool operator == ( Position pos ){
 		return ( x == pos.x && y == pos.y );
 	}
+
+	void operator = (Position pos){
+		x = pos.x;
+		y = pos.y;
+	}
 };
+
+namespace Color{
+	const int black = GetColor( 0, 0, 0 );
+	const int brown = GetColor( 192, 72, 0 );
+	const int white = GetColor( 0, 0, 0 );
+}
 
 #endif // !DEFINITION_H

@@ -38,8 +38,8 @@ void ResultScene::Draw(){
 	DrawGraph( 0, 0, instance->GetBackGroundHandle(), false );
 
 	// 結果表示
-	DrawFormatString( 100, WINDOW_HEIGHT / 2, GetColor( 0, 0, 0 ), "経過時間 : %02d分 %02d秒", GameManager::GetInstance()->GetMin(), GameManager::GetInstance()->GetSec() );
-	DrawFormatString( 100, WINDOW_HEIGHT / 2 + 50, GetColor( 0, 0, 0 ), "移動回数 : %d回", GameManager::GetInstance()->GetTurn() );
+	DrawFormatString( 100, WINDOW_HEIGHT / 2, Color::black, "経過時間 : %02d分 %02d秒", GameManager::GetInstance()->GetMin(), GameManager::GetInstance()->GetSec() );
+	DrawFormatString( 100, WINDOW_HEIGHT / 2 + 50, Color::black, "移動回数 : %d回", GameManager::GetInstance()->GetTurn() );
 
 	// Enterキーを押すように誘導(0.5秒間隔で点滅)
 	static int flashingCounter = 0;
